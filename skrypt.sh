@@ -34,6 +34,37 @@ grep-- works in 3 different modes:
 exit 1
 }
 
+function return_lines_matching_regex() {
+	
+	file=$1
+	pattern=$2
+	
+	sed_pattern='/'$pattern'/p'
+	cat $file | sed -nr $sed_pattern
+	
+}
+
+function find_and_replace_in_file() {
+	file=$1
+	pattern=$2
+	replacement_string=$3
+	
+	sed_pattern='s/'$pattern'/'$replacement_string'/g'
+	sed -i $sed_pattern $file	
+
+}
+
+function delete_lines_that_match_from_file() {
+	file=$1
+	pattern=$2
+	
+	sed_pattern='/'$pattern'/d'
+	sed -i $sed_pattern $file	
+	#cat $file  | sed -n $sed_pattern | cat
+}
+
+
+
 if [ $# -eq 0 ]; then
 	manual
 fi
