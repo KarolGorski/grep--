@@ -1,33 +1,49 @@
 #!/bin/bash
 
 function manual(){
-	
+	echo "Hi there :)
+So, you want to use Grep--. 
+Not wisely, my Padawan. 
+You can use our app to search for regex in file/s. 
+Kinda smart, don't you think?
+
+Fundamental use: grep-- <flags> <file to search> <regex ( w jakiej formie ? )>
+
+ Flags:h
+ -c 		- grep-- will color result
+ -h 		- manual (yes, this manual :v)
+ -i 		- grep-- will ignore size of letters
+ -l <file> 	- grep-- will take regexes from file and check'em all
+ -R <new regex> - grep-- will replace regex which it finds for new regex
+ -r 		- grep-- will delete lines with given regex
+"
+exit 1
 }
 
 if [ $# -eq 0 ]; then
-	manual()
+	manual
 fi
 
 while getopts "richR" opt; do
 	case $opt in
-	r)
-		echo "mam flage r - szukanie rekursywnie"
-		;;
 	c)
 		echo "mam flage c - kolorowanie wyniku"
 		;;
 	h)	
-		echo "Instrukcja obsługi programu"
+		echo "You've chosen our help
+"
+		manual
+		exit 1
 		;;
 	i)
 		echo "Ignorowanie wielkości znaków"
 		;;
 	l)	
-		echo "Pobieranie wzorców z linii"
+		echo "Pobieranie wzorców z pliku"
 		;;
 	R)	echo "Zamiana regexa"
 		;;
-	x)
+	r)
 		echo "Usuwanie lini pasujących do wzorca"
 		;;
 	esac
