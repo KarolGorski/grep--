@@ -1,5 +1,9 @@
 #!/bin/bash
 
+argcount=$#
+wzorzec=$(($argcount-1))
+sciezka=$(($argcount-2))
+
 function manual(){
 	echo "Hi there :)
 So, you want to use Grep--. 
@@ -69,40 +73,53 @@ if [ $# -eq 0 ]; then
 	manual
 fi
 
+kolor=0
+casesensitivity=0
+fromlist=0
+replace=0
+remove=0
+
+
 while getopts "richRl" opt; do
 	case $opt in
-	c)
-		echo "mam flage c - kolorowanie wyniku"
-		;;
 	h)	
-		echo "You've chosen our help
-"
+		#echo "You've chosen our help"
 		manual
 		exit 1
 		;;
+	c)
+		kolor=1
+		echo "mam flage c - kolorowanie wyniku"
+		;;
 	i)
-		echo "Ignorowanie wielkości znaków"
+		casesensitivity=1
+		#echo "Ignorowanie wielkości znaków"
 		;;
 	l)	
-		echo "Pobieranie wzorców z pliku"
+		fromlist=1
+		#echo "Pobieranie wzorców z pliku"
 		;;
-	R)	echo "Zamiana regexa"
+	R)	
+		replace=1
+		#echo "Zamiana regexa"
 		;;
 	r)
-		echo "Usuwanie lini pasujących do wzorca"
+		remove=1
+		#echo "Usuwanie lini pasujących do wzorca"
 		;;
 	esac
 done
 
-
-
-#proponuje najpierw zrobic grepa przyjmujacego 2 stringi i ogarniajacego czy 1 spelnia dany wzorzec podany w drugim stringu
-#znaczy
-#grep-- mamamamama mama*(nie pamietam skladni grepa ale rozumiecie, chodzi o wszystkie slowa zaczynajace sie na mama)
-#zwroci 1
-
-sprawdzane="$1"
-wzorzec="$2"
+if [ "$kolor" =="$replace" == "1" ];then
+	echo "Niedozwolone połączenie flag, zobacz manual -h"
+	exit 1;
+elif [ "$remove" == "$replace" == "1" ];then
+	echo "Niedozwolone połączenie flag, zobacz manual -h"
+	exit 1;
+elif [ "$kolor" == "$remove" == "1" ];then
+	echo "Niedozwolone połączenie flag, zobacz manual -h"
+	exit 1;
+fi
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -135,15 +152,11 @@ function fundamental () {
                 else
                     echo -ne "${GREEN}$test"
                 fi
-
-                echo -n " "
             done
-
-            echo -n $'\n'
         fi
 
         i=$((i+1))
     done
 }
 
-fundamental $sprawdzane
+return_lines_matching_regex $sciezka $wzorzec
