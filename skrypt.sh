@@ -1,11 +1,21 @@
 #!/bin/bash
 
-#sprawdzanie liczby argumentow
-if [ "$#" -ne 2 ]; then
-    echo "Nieprawidlowa liczba argumentow"
-    exit 1
-fi
 
+
+
+#sprawdzanie liczby argumentow
+if [ "$#" -eq 3 ]; then
+    while getopts "rc" opt; do
+		case $opt in
+		r)
+			echo "mam flage r - szukanie rekursywnie"
+			;;
+		c)
+			echo "mam flage c - kolorowanie wyniku"
+			;;
+		esac
+	done
+fi
 
 
 
