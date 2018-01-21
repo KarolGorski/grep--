@@ -9,13 +9,27 @@ Kinda smart, don't you think?
 
 Fundamental use: grep-- <flags> <file to search> <regex ( w jakiej formie ? )>
 
- Flags:h
+ Flags
  -c 		- grep-- will color result
  -h 		- manual (yes, this manual :v)
  -i 		- grep-- will ignore size of letters
- -l <file> 	- grep-- will take regexes from file and check'em all
+ -l <file> 	- grep-- will TAKE REGEXES FROM file and check'em all
  -R <new regex> - grep-- will replace regex which it finds for new regex
  -r 		- grep-- will delete lines with given regex
+
+grep-- works recursively at default. You specify on your own if u want to search in file ( just give him path to file ) or path (path to some folder ) to search for lines which containts your regex.
+
+grep-- works in 3 different modes:
+	-searching ( no flag, just fundamental use ). You can add flags:
+		-c
+		-i
+		-l 
+	-replacing regex by new regex. You can add flags:
+		-i
+		-l
+	-deleting regex. You can add flags:
+		-i
+		-l
 "
 exit 1
 }
@@ -24,7 +38,7 @@ if [ $# -eq 0 ]; then
 	manual
 fi
 
-while getopts "richR" opt; do
+while getopts "richRl" opt; do
 	case $opt in
 	c)
 		echo "mam flage c - kolorowanie wyniku"
