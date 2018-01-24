@@ -44,8 +44,8 @@ function return_lines_matching_regex() {
 	pattern=$2
 	
 	sed_pattern='/'$pattern'/p'
-	cat $file | sed -nr $sed_pattern
-	
+	echo $file | sed -nr $sed_pattern
+
 }
 
 function find_and_replace_in_file() {
@@ -110,14 +110,15 @@ while getopts "richRl" opt; do
 	esac
 done
 
-if [ "$kolor" =="$replace" == "1" ];then
-	echo "Niedozwolone połączenie flag, zobacz manual -h"
+#if [ "$kolor" == "$replace" == "1" ];then
+if [ $kolor -eq 1 ] && [ $replace -eq 1 ]; then
+	echo "Not allowed flags use, better see option -h for some help"
 	exit 1;
-elif [ "$remove" == "$replace" == "1" ];then
-	echo "Niedozwolone połączenie flag, zobacz manual -h"
+elif [ "$remove" == "$replace" ] && [ "$replace" == "1" ];then
+	echo "Not allowed flags use, better see option -h for some help"
 	exit 1;
-elif [ "$kolor" == "$remove" == "1" ];then
-	echo "Niedozwolone połączenie flag, zobacz manual -h"
+elif [ "$kolor" == "$remove" ] && [ "$remove" == "1" ];then
+	echo "Not allowed flags use, better see option -h for some help"
 	exit 1;
 fi
 
