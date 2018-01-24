@@ -1,8 +1,12 @@
 #!/bin/bash
 
-argcount=$#
-wzorzec=$(($argcount-1))
-sciezka=$(($argcount-2))
+#argcount=$@
+#wzorzec=$(($argcount-1))
+#sciezka=$(($argcount-1))
+
+wzorzec="${@: -1}"
+sciezka="${@: -2:1}"
+
 
 function manual(){
 	echo "Hi there :)
@@ -33,18 +37,18 @@ grep-- works in 3 different modes:
 		-l
 	-deleting regex. You can add flags:
 		-i
-		-l
-"
+		-l"
 exit 1
 }
 
 function return_lines_matching_regex() {
 	
+	
 	file=$1
 	pattern=$2
 	
 	sed_pattern='/'$pattern'/p'
-	echo $file | sed -nr $sed_pattern
+	cat $file | sed -nr $sed_pattern
 
 }
 
@@ -67,6 +71,9 @@ function delete_lines_that_match_from_file() {
 	#cat $file  | sed -n $sed_pattern | cat
 }
 
+function color() {
+	echo "NO CO KURDE"
+}
 
 
 if [ $# -eq 0 ]; then
@@ -110,7 +117,6 @@ while getopts "richRl" opt; do
 	esac
 done
 
-#if [ "$kolor" == "$replace" == "1" ];then
 if [ $kolor -eq 1 ] && [ $replace -eq 1 ]; then
 	echo "Not allowed flags use, better see option -h for some help"
 	exit 1;
@@ -121,6 +127,7 @@ elif [ "$kolor" == "$remove" ] && [ "$remove" == "1" ];then
 	echo "Not allowed flags use, better see option -h for some help"
 	exit 1;
 fi
+
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -160,4 +167,14 @@ function fundamental () {
     done
 }
 
-return_lines_matching_regex $sciezka $wzorzec
+
+
+#Dzialanie
+if [ $remove -eq 0 ] && [ $replace -eq 0 ]; then
+	echo "Fundamental use:"
+	if [ $kolor -eq 1 ]
+		return_lines_matching_regex $sciezka $wzorzec
+	
+fi
+
+

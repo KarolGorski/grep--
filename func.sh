@@ -14,6 +14,10 @@ function return_lines_matching_regex() {
 #return_lines_matching_regex file.txt "a?a"
 
 
+return_lines_matching_regex "${@: -2:1}" "${@: -1}"
+
+
+
 
 function find_and_replace_in_file() {
 	file=$1
