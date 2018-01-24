@@ -43,6 +43,7 @@ exit 1
 
 function return_lines_matching_regex() {
 	
+#TRZEBA ZROBIC SPRAWDZANIE CZY FILE TO FILE CZY DIRECTORY I DAC IFA ZEBY CAT LECIAL PO PLIKACH, BO OBSLUGUJE TYLKO 1 NA RAZ https://stackoverflow.com/questions/4665051/check-if-passed-argument-is-file-or-directory-in-bash
 	
 	file=$1
 	pattern=$2
@@ -53,6 +54,9 @@ function return_lines_matching_regex() {
 }
 
 function find_and_replace_in_file() {
+
+#Tez trzeba zrobic sprawdzanie czy file to file czy directory
+
 	file=$1
 	pattern=$2
 	replacement_string=$3
@@ -63,6 +67,9 @@ function find_and_replace_in_file() {
 }
 
 function delete_lines_that_match_from_file() {
+
+#Tez trzeba zrobic sprawdzanie czy file to file czy directory
+
 	file=$1
 	pattern=$2
 	
@@ -72,6 +79,7 @@ function delete_lines_that_match_from_file() {
 }
 
 function color() {
+#NAWET NIE WIEM JAK SIE ZA TO WZIAC
 	echo "NO CO KURDE"
 }
 
@@ -167,7 +175,7 @@ function fundamental () {
     done
 }
 
-
+# W DZIALANIU TRZEBA DUZO IFOW POROBIC - dobrych ifow
 
 #Dzialanie
 if [ $remove -eq 0 ] && [ $replace -eq 0 ]; then
