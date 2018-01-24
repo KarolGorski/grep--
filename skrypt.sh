@@ -171,9 +171,13 @@ function fundamental () {
 
 #Dzialanie
 if [ $remove -eq 0 ] && [ $replace -eq 0 ]; then
-	echo "Fundamental use:"
-	if [ $kolor -eq 1 ]
+	echo "Uzyty wzorzec: $wzorzec dla lokalizacji: $sciezka
+"
+	return_lines_matching_regex $sciezka $wzorzec
+
+	if [ $kolor -eq 1 ]; then
 		return_lines_matching_regex $sciezka $wzorzec
+	fi
 	
 fi
 
