@@ -1,0 +1,156 @@
+#!/bin/bash
+
+echo -e "--------Running grep-- with args" ${@} "\n"
+
+pattern="${@: -1}"
+path="${@: -2:1}"
+
+function return_lines_matching_regex() {
+	
+	file=$1
+	pattern=$2
+	
+	sed_pattern='/'$pattern'/p'
+	cat $file | sed -nr $sed_pattern
+
+}
+
+function find_and_replace_in_file() {
+	file=$1
+	pattern=$2
+	replacement_string=$3
+	
+	sed_pattern='s/'$pattern'/'$replacement_string'/g'
+	sed -i $sed_pattern $file	
+
+}
+
+function delete_lines_that_match_from_file() {
+	file=$1
+	pattern=$2
+	
+	sed_pattern='/'$pattern'/d'
+	sed -i $sed_pattern $file	
+	#cat $file  | sed -n $sed_pattern | cat
+}
+
+
+
+function manual(){
+	echo "Hi there :)
+So, you want to use Grep--. 
+Not wisely, my Padawan. 
+You can use our app to search for regex in file/s. 
+Kinda smart, don't you think?
+
+Basic usage: grep-- <flags> <file to search> <phrase/regex>
+<regex/regex> - regex in the form unix 'sed' takes in (for more please visit: https://www.gnu.org/software/sed/manual/html_node/Regular-Expressions-Overview.html)
+
+ Flags
+ -h					manual (yes, this manual :v)
+ -c					color results
+ -i					ignore letter case (searching for 'Jon Snow' will return the same result as searching for 'JoN sNoW')
+ -l <file>			perform a check for all
+ -R <new regex>		replace regex which it finds for new regex
+ -r					remove lines matching given phrase/regex
+
+grep-- works recursively by default. If you specify a file, grep-- will treat the file contents as input. If you specify a folder, grep-- will be executed for each file in that folder and then for each folder in that folder and so on, recursively.
+
+grep-- works in 3 different modes:
+	-searching ( no flag, just fundamental use ). You can add flags:
+		-c
+		-i
+		-l 
+	-replacing regex by new regex. You can add flags:
+		-i
+		-l
+	-deleting regex. You can add flags:
+		-i
+		-l
+"
+}
+
+
+if [ $# -lt 2 ]; then
+	manual
+	exit 1
+fi
+
+
+
+
+# parse script arguments 
+color=0
+ignoreLetterCase=0
+takeArgumentsFromList=0
+findAndReplace=0
+removeMatchingLines=0
+
+
+
+while getopts "hrichRl" opt; do
+	case $opt in
+	h)	
+		#echo "You've chosen our help"
+		manual
+		exit 1
+		;;
+	c)
+		color=1
+		#echo "mam flage c - kolorowanie wyniku"
+		;;
+	i)
+		ignoreLetterCase=1
+		#echo "Ignorowanie wielkości znaków"
+		;;
+	l)	
+		takeArgumentsFromList=1
+		#echo "Pobieranie wzorców z pliku"
+		;;
+	R)	
+		findAndReplace=1
+		#echo "Zamiana regexa"
+		;;
+	r)
+		removeMatchingLines=1
+		#echo "Usuwanie lini pasujących do wzorca"
+		;;
+	esac
+done
+
+
+# print flag statuses to see if they got parsed correcly
+echo 'after parsing the status of args is as follows'
+echo 'color=' $color
+echo 'ignoreLetterCase=' $ignoreLetterCase
+echo 'takeArgumentsFromList=' $takeArgumentsFromList
+echo 'findAndReplace=' $findAndReplace
+echo 'removeMatchingLines=' $removeMatchingLines
+echo -e '\n'
+
+
+# run recursively
+if [ -f "$path" ]; then
+
+	#TODO process flags for file
+    return_lines_matching_regex $path $pattern
+elif [ -d "$path" ]; then
+    echo $path "is a folder"
+    
+    cd $path
+    for filename in *; do
+        echo "current filename is " $filename
+        
+        # changing the penultimate script arg to $filename
+        # i know this looks horrible. bash is hideous, yes it is.
+		penultimate_arguments_position=$((${#@}-2))
+		args_with_path_changed="${@:1:$penultimate_arguments_position} $filename ${@: -1}"
+		
+		grep-- $args_with_path_changed
+		
+	done
+    cd ..
+else
+	echo $path "is empty or does not exist"
+	exit 1
+fi
