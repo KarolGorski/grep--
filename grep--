@@ -1,9 +1,10 @@
 #!/bin/bash
 
-echo -e "--------Running grep-- with args" ${@} "\n"
+echo -e "\n--------Running grep-- with args" ${@} " ----------------\n"
 
 pattern="${@: -1}"
 path="${@: -2:1}"
+
 
 function return_lines_matching_regex() {
 	
@@ -34,6 +35,10 @@ function delete_lines_that_match_from_file() {
 	#cat $file  | sed -n $sed_pattern | cat
 }
 
+function install() {
+	PATH=$PATH:$pwd
+}
+
 
 
 function manual(){
@@ -47,6 +52,7 @@ Basic usage: grep-- <flags> <file to search> <phrase/regex>
 <regex/regex> - regex in the form unix 'sed' takes in (for more please visit: https://www.gnu.org/software/sed/manual/html_node/Regular-Expressions-Overview.html)
 
  Flags
+ -I					install grep-- on your computer (add to PATH)
  -h					manual (yes, this manual :v)
  -c					color results
  -i					ignore letter case (searching for 'Jon Snow' will return the same result as searching for 'JoN sNoW')
@@ -71,14 +77,6 @@ grep-- works in 3 different modes:
 }
 
 
-if [ $# -lt 2 ]; then
-	manual
-	exit 1
-fi
-
-
-
-
 # parse script arguments 
 color=0
 ignoreLetterCase=0
@@ -88,8 +86,13 @@ removeMatchingLines=0
 
 
 
-while getopts "hrichRl" opt; do
+while getopts "IhrichRl" opt; do
 	case $opt in
+	I)
+		echo "You've installed grep in your path. Now you can run it like grep-- "
+		install
+		exit 1
+		;;
 	h)	
 		#echo "You've chosen our help"
 		manual
@@ -139,7 +142,7 @@ elif [ -d "$path" ]; then
     
     cd $path
     for filename in *; do
-        echo "current filename is " $filename
+        echo -e "\n\n current filename is " $filename
         
         # changing the penultimate script arg to $filename
         # i know this looks horrible. bash is hideous, yes it is.
