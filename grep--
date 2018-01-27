@@ -12,7 +12,7 @@ function return_lines_matching_regex() {
 	pattern=$2
 	
 	sed_pattern='/'$pattern'/p'
-	cat $file | sed -nr $sed_pattern
+	cat $file | sed -nr $sed_pattern 
 
 }
 
@@ -39,6 +39,23 @@ function install() {
 	PATH=$PATH:$pwd
 }
 
+function color() { 
+RED='\033[0;31m' 
+WHITE='\033[1;37m' 
+while read data; 
+	do 
+		for word in $data; do 
+				if [[ $word == *"$1"* ]];then 
+					echo -ne "${RED}$word " 
+				else 
+					echo -ne "${WHITE}$word " 
+				fi 
+			done 
+			echo -ne "${WHITE}\n"
+		done 
+exit 1 
+}
+
 
 
 function manual(){
@@ -57,7 +74,7 @@ Basic usage: grep-- <flags> <file to search> <phrase/regex>
  -c					color results
  -i					ignore letter case (searching for 'Jon Snow' will return the same result as searching for 'JoN sNoW')
  -l <file>			perform a check for all
- -R <new regex>		replace regex which it finds for new regex
+ -R 				replace regex which it finds. grep-- will ask you for word to put in
  -r					remove lines matching given phrase/regex
 
 grep-- works recursively by default. If you specify a file, grep-- will treat the file contents as input. If you specify a folder, grep-- will be executed for each file in that folder and then for each folder in that folder and so on, recursively.
@@ -121,6 +138,16 @@ while getopts "IhrichRl" opt; do
 	esac
 done
 
+if [ $color -eq 1 ] && [ $findAndReplace -eq 1 ]; then
+	echo "Not allowed flags use, better see option -h for some help"
+	exit 1;
+elif [ "$removeMatchingLines" == "$findAndReplace" ] && [ "$findAndReplace" == "1" ];then
+	echo "Not allowed flags use, better see option -h for some help"
+	exit 1;
+elif [ "$color" == "$removeMatchingLines" ] && [ "$removeMatchingLines" == "1" ];then
+	echo "Not allowed flags use, better see option -h for some help"
+	exit 1;
+fi
 
 # print flag statuses to see if they got parsed correcly
 echo 'after parsing the status of args is as follows'
@@ -136,7 +163,22 @@ echo -e '\n'
 if [ -f "$path" ]; then
 
 	#TODO process flags for file
-    return_lines_matching_regex $path $pattern
+    if [ $findAndReplace -eq 1 ]; then
+		echo -e "\n--------------Type word which is wanted to replace regex found--------------- \n"
+		read argument_to_replace_regex
+		find_and_replace_in_file $path $pattern $argument_to_replace_regex
+		
+	elif [ $removeMatchingLines -eq 1 ]; then
+		delete_lines_that_match_from_file $path $pattern
+		
+	else
+		if [ $color -eq 1 ]; then
+		return_lines_matching_regex $path $pattern | color ${@: -1}
+		else
+		return_lines_matching_regex $path $pattern
+		fi
+	fi
+	
 elif [ -d "$path" ]; then
     echo $path "is a folder"
     
