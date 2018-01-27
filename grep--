@@ -5,94 +5,49 @@ echo -e "\n--------Running grep-- with args" ${@} " ----------------\n"
 pattern="${@: -1}"
 path="${@: -2:1}"
 
+function manual(){
+	echo "Hi there :)
+		So, you want to use Grep--. 
+		Not wisely, my Padawan. 
+		You can use our app to search for regex in file/s. 
+		Kinda smart, don't you think?
 
-function return_lines_matching_regex() {
-	
-	file=$1
-	pattern=$2
-	
-	sed_pattern='/'$pattern'/p'
-	cat $file | sed -nr $sed_pattern 
+		Basic usage: grep-- <flags> <file to search> <phrase/regex>
+		<regex/regex> - regex in the form unix 'sed' takes in (for more please visit: https://www.gnu.org/software/sed/manual/html_node/Regular-Expressions-Overview.html)
 
-}
+		Flags
+		-I					install grep-- on your computer (add to PATH)
+		-h					manual (yes, this manual :v)
+		-c					color results
+		-i					ignore letter case (searching for 'Jon Snow' will return the same result as searching for 'JoN sNoW')
+		-l <file>			perform a check for all
+		-R 				replace regex which it finds. grep-- will ask you for word to put in
+		-r					remove lines matching given phrase/regex
 
-function find_and_replace_in_file() {
-	file=$1
-	pattern=$2
-	replacement_string=$3
-	
-	sed_pattern='s/'$pattern'/'$replacement_string'/g'
-	sed -i $sed_pattern $file	
+		grep-- works recursively by default. If you specify a file, grep-- will treat the file contents as input. If you specify a folder, grep-- will be executed for each file in that folder and then for each folder in that folder and so on, recursively.
 
-}
-
-function delete_lines_that_match_from_file() {
-	file=$1
-	pattern=$2
-	
-	sed_pattern='/'$pattern'/d'
-	sed -i $sed_pattern $file	
-	#cat $file  | sed -n $sed_pattern | cat
+		grep-- works in 3 different modes:
+			-searching ( no flag, just fundamental use ). You can add flags:
+				-c
+				-i
+				-l 
+			-replacing regex by new regex. You can add flags:
+				-i
+				-l
+			-deleting regex. You can add flags:
+				-i
+				-l
+		"
 }
 
 function install() {
 	PATH=$PATH:$pwd
 }
 
-function color() { 
-RED='\033[0;31m' 
-WHITE='\033[1;37m' 
-while read data; 
-	do 
-		for word in $data; do 
-				if [[ $word == *"$1"* ]];then 
-					echo -ne "${RED}$word " 
-				else 
-					echo -ne "${WHITE}$word " 
-				fi 
-			done 
-			echo -ne "${WHITE}\n"
-		done 
-exit 1 
-}
-
-
-
-function manual(){
-	echo "Hi there :)
-So, you want to use Grep--. 
-Not wisely, my Padawan. 
-You can use our app to search for regex in file/s. 
-Kinda smart, don't you think?
-
-Basic usage: grep-- <flags> <file to search> <phrase/regex>
-<regex/regex> - regex in the form unix 'sed' takes in (for more please visit: https://www.gnu.org/software/sed/manual/html_node/Regular-Expressions-Overview.html)
-
- Flags
- -I					install grep-- on your computer (add to PATH)
- -h					manual (yes, this manual :v)
- -c					color results
- -i					ignore letter case (searching for 'Jon Snow' will return the same result as searching for 'JoN sNoW')
- -l <file>			perform a check for all
- -R 				replace regex which it finds. grep-- will ask you for word to put in
- -r					remove lines matching given phrase/regex
-
-grep-- works recursively by default. If you specify a file, grep-- will treat the file contents as input. If you specify a folder, grep-- will be executed for each file in that folder and then for each folder in that folder and so on, recursively.
-
-grep-- works in 3 different modes:
-	-searching ( no flag, just fundamental use ). You can add flags:
-		-c
-		-i
-		-l 
-	-replacing regex by new regex. You can add flags:
-		-i
-		-l
-	-deleting regex. You can add flags:
-		-i
-		-l
-"
-}
-
+if [ $# -eq 0 ];then
+	manual
+	exit 1
+fi
 
 # parse script arguments 
 color=0
@@ -100,8 +55,6 @@ ignoreLetterCase=0
 takeArgumentsFromList=0
 findAndReplace=0
 removeMatchingLines=0
-
-
 
 while getopts "IhrichRl" opt; do
 	case $opt in
@@ -138,6 +91,89 @@ while getopts "IhrichRl" opt; do
 	esac
 done
 
+function echoFlags(){
+	echo "wzorzec toasd $pattern"
+	echo 'after parsing the status of args is as follows'
+	echo 'color=' $color
+	echo 'ignoreLetterCase=' $ignoreLetterCase
+	echo 'takeArgumentsFromList=' $takeArgumentsFromList
+	echo 'findAndReplace=' $findAndReplace
+	echo 'removeMatchingLines=' $removeMatchingLines
+	echo -e '\n'
+}
+
+function return_lines_matching_regex() {
+	file=$1
+	pattern=$2
+	
+	if [ $ignoreLetterCase -eq 1 ];then
+		sed_pattern='/'$pattern'/Ip'
+	else
+		sed_pattern='/'$pattern'/p'
+	fi 
+
+	cat $file | sed -nr $sed_pattern | printOutput
+}
+
+function find_and_replace_in_file() {
+	file=$1
+	pattern=$2
+	replacement_string=$3
+	
+	if [ $ignoreLetterCase -eq 1 ];then
+		sed_pattern='s/'$pattern'/'$replacement_string'/Ig'
+	else
+		sed_pattern='s/'$pattern'/'$replacement_string'/g'
+	fi 
+
+	sed -i $sed_pattern $file	
+}
+
+function delete_lines_that_match_from_file() {
+	file=$1
+	pattern=$2
+
+	if [ $ignoreLetterCase -eq 1 ];then
+		sed_pattern='/'$pattern'/Id'
+	else
+		sed_pattern='/'$pattern'/Id'
+	fi 
+	
+	sed -i $sed_pattern $file	
+	#cat $file  | sed -n $sed_pattern | cat
+}
+
+function printOutput() { 
+if [ $color -eq 1 ];then
+	RED='\033[0;31m' 
+	WHITE='\033[1;37m' 
+	while read data; 
+		do 
+			for word in $data; do 
+				if [[ "${word,,}" == *"${pattern,,}"* ]];then 
+					echo -ne "${RED}$word " 
+				else 
+					echo -ne "${WHITE}$word " 
+				fi 
+			done 
+		echo -ne "${WHITE}\n"
+	done
+else
+	while read data; 
+		do 
+			for word in $data; do 
+				if [[ $word == *"$pattern"* ]];then 
+					echo -ne "$word " 
+				else 
+					echo -ne "$word " 
+				fi 
+			done 
+		echo
+	done
+fi
+exit 1 
+}
+
 if [ $color -eq 1 ] && [ $findAndReplace -eq 1 ]; then
 	echo "Not allowed flags use, better see option -h for some help"
 	exit 1;
@@ -149,22 +185,10 @@ elif [ "$color" == "$removeMatchingLines" ] && [ "$removeMatchingLines" == "1" ]
 	exit 1;
 fi
 
-# print flag statuses to see if they got parsed correcly
-echo 'after parsing the status of args is as follows'
-echo 'color=' $color
-echo 'ignoreLetterCase=' $ignoreLetterCase
-echo 'takeArgumentsFromList=' $takeArgumentsFromList
-echo 'findAndReplace=' $findAndReplace
-echo 'removeMatchingLines=' $removeMatchingLines
-echo -e '\n'
-
-
 # run recursively
 if [ -f "$path" ]; then
-
-	#TODO process flags for file
+	echo "$(realpath $path):"
     if [ $findAndReplace -eq 1 ]; then
-		echo -e "\n--------------Type word which is wanted to replace regex found--------------- \n"
 		read argument_to_replace_regex
 		find_and_replace_in_file $path $pattern $argument_to_replace_regex
 		
@@ -172,25 +196,17 @@ if [ -f "$path" ]; then
 		delete_lines_that_match_from_file $path $pattern
 		
 	else
-		if [ $color -eq 1 ]; then
-		return_lines_matching_regex $path $pattern | color ${@: -1}
-		else
 		return_lines_matching_regex $path $pattern
-		fi
 	fi
 	
 elif [ -d "$path" ]; then
-    echo $path "is a folder"
-    
+	echo "FOLDER $path"
+	echo
     cd $path
     for filename in *; do
-        echo -e "\n\n current filename is " $filename
-        
-        # changing the penultimate script arg to $filename
-        # i know this looks horrible. bash is hideous, yes it is.
 		penultimate_arguments_position=$((${#@}-2))
 		args_with_path_changed="${@:1:$penultimate_arguments_position} $filename ${@: -1}"
-		
+	
 		grep-- $args_with_path_changed
 		
 	done
