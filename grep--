@@ -1,9 +1,14 @@
 #!/bin/bash
 
-echo -e "\n--------Running grep-- with args" ${@} " ----------------\n"
+#echo -e "--------Running grep-- with args" ${@} " ----------------"
 
 pattern="${@: -1}"
 path="${@: -2:1}"
+
+echo "GREPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP $@"
+
+
+#echo -e "--------Running grep-- with args" $(realpath $path) " ----------------"
 
 function manual(){
 	echo "Hi there :)
@@ -20,7 +25,7 @@ function manual(){
 		-h					manual (yes, this manual :v)
 		-c					color results
 		-i					ignore letter case (searching for 'Jon Snow' will return the same result as searching for 'JoN sNoW')
-		-l <file>			perform a check for all
+		-l 				perform a check for all in file ( you must specify file instead of pattern )
 		-R 				replace regex which it finds. grep-- will ask you for word to put in
 		-r					remove lines matching given phrase/regex
 
@@ -41,7 +46,8 @@ function manual(){
 }
 
 function install() {
-	PATH=$PATH:$pwd
+	pwd=`pwd`
+	export PATH="$PATH:$pwd"
 }
 
 if [ $# -eq 0 ];then
@@ -59,8 +65,8 @@ removeMatchingLines=0
 while getopts "IhrichRl" opt; do
 	case $opt in
 	I)
-		echo "You've installed grep in your path. Now you can run it like grep-- "
 		install
+		echo "You've installed grep in your path. Now you can run it like grep-- "
 		exit 1
 		;;
 	h)	
@@ -105,7 +111,7 @@ function echoFlags(){
 function return_lines_matching_regex() {
 	file=$1
 	pattern=$2
-	
+
 	if [ $ignoreLetterCase -eq 1 ];then
 		sed_pattern='/'$pattern'/Ip'
 	else
@@ -144,11 +150,14 @@ function delete_lines_that_match_from_file() {
 }
 
 function printOutput() { 
+echo "WCHODZI DO FUNKCJI NIEEEEEEEEEEE WCHODZI DO PETLI"
+#CALY PROBLEM - NIE MA DATY ZEBY WEJSC DO PETLI JESLI FLAGA -l
 if [ $color -eq 1 ];then
 	RED='\033[0;31m' 
-	WHITE='\033[1;37m' 
+	WHITE='\033[1;37m'
 	while read data; 
 		do 
+		echo "WCHODZI DO FUNKCJI NIEEEEEEEEEEE WCHODZI DO PETLI 2 "
 			for word in $data; do 
 				if [[ "${word,,}" == *"${pattern,,}"* ]];then 
 					echo -ne "${RED}$word " 
@@ -159,8 +168,10 @@ if [ $color -eq 1 ];then
 		echo -ne "${WHITE}\n"
 	done
 else
+	echo
 	while read data; 
 		do 
+		echo "WCHODZI DO FUNKCJI NIEEEEEEEEEEE WCHODZI DO PETLI 3"
 			for word in $data; do 
 				if [[ $word == *"$pattern"* ]];then 
 					echo -ne "$word " 
@@ -185,10 +196,19 @@ elif [ "$color" == "$removeMatchingLines" ] && [ "$removeMatchingLines" == "1" ]
 	exit 1;
 fi
 
+if [ $color -eq 1 ]; then
+	echo -ne "\033[1;37m"
+fi
+
+function RUN() {
 # run recursively
 if [ -f "$path" ]; then
-	echo "$(realpath $path):"
+	#echo "$(realpath $path):"
+	echo
+	echo "---File $path :"
+	
     if [ $findAndReplace -eq 1 ]; then
+		echo "Give me word to replace regexes"
 		read argument_to_replace_regex
 		find_and_replace_in_file $path $pattern $argument_to_replace_regex
 		
@@ -199,14 +219,16 @@ if [ -f "$path" ]; then
 		return_lines_matching_regex $path $pattern
 	fi
 	
+	
 elif [ -d "$path" ]; then
-	echo "FOLDER $path"
-	echo
+echo
+	echo -e "------Directory: $path ------"
     cd $path
     for filename in *; do
 		penultimate_arguments_position=$((${#@}-2))
 		args_with_path_changed="${@:1:$penultimate_arguments_position} $filename ${@: -1}"
 	
+		echo "_________________________ $args_with_path_changed"
 		grep-- $args_with_path_changed
 		
 	done
@@ -215,3 +237,41 @@ else
 	echo $path "is empty or does not exist"
 	exit 1
 fi
+}
+
+#List or not list
+
+function concateFlags(){
+	concatedFlags="-" 
+		if [ $color -eq 1 ];then
+			concatedFlags+="c" 
+		fi
+		
+		if [ $ignoreLetterCase -eq 1 ];then
+			concatedFlags+="i" 
+		fi
+		
+		if [ $findAndReplace -eq 1 ];then
+			concatedFlags+="R" 
+		fi
+		
+		if [ $removeMatchingLines -eq 1 ]; then
+			concatedFlags+="r" 
+		fi
+}
+
+if [ $takeArgumentsFromList -eq 1 ]; then
+
+	echo
+	while read x; do
+		concateFlags
+		echo "$concatedFlags $path $x"
+		echo "$@"
+		#RUN $concatedFlags $path $x
+		RUN $concatedFlags $path $x
+	done < $pattern
+	
+else 
+	RUN $@
+fi
+
